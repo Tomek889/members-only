@@ -23,7 +23,19 @@
         <label for="password">Password</label>
         <input id="password" name="password" type="password" />
       </div>
+      <div>
+        <label for="confirmPassword">Confirm Password</label>
+        <input id="confirmPassword" name="confirmPassword" type="password" />
+      </div>
       <button type="submit">Sign Up</button>
+
+      <% if (errors) { %>
+      <ul>
+        <% errors.forEach(error => { %>
+        <li><%= error.msg %></li>
+        <% }) %>
+      </ul>
+      <% } %>
     </form>
   </body>
 </html>

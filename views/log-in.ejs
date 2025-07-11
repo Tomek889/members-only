@@ -8,10 +8,18 @@
   <body>
     <h1>please log in</h1>
     <form action="/log-in" method="POST">
-      <label for="username">Username:</label>
-      <input id="username" name="username" placeholder="username" type="text" />
-      <label for="password">Password:</label>
-      <input id="password" name="password" type="password" />
+      <div>
+        <label for="username">Username:</label>
+        <input
+          id="username"
+          name="username"
+          type="text"
+        />
+      </div>
+      <div>
+        <label for="password">Password:</label>
+        <input id="password" name="password" type="password" />
+      </div>
       <button type="submit">Log In</button>
     </form>
   </body>
