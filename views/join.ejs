@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Join the Club</title>
+  </head>
+  <body>
+    <h1>Join the Secret Club</h1>
+    <form action="/join-club" method="POST">
+      <label for="passcode">Secret Passcode:</label>
+      <input type="password" name="passcode" required />
+      <button type="submit">Submit</button>
+
+      <% if (error) { %>
+      <p class="error"><%= error %></p>
+      <% } %>
+    </form>
+  </body>
+</html>

@@ -4,6 +4,8 @@ const bcrypt = require("bcrypt");
 const { body, validationResult } = require("express-validator");
 const db = require("../db/db");
 
+const SECRET_PASSCODE = process.env.SECRET_PASSCODE || "secret";
+
 indexRouter.get("/", (req, res) => {
   res.render("index");
 });
@@ -56,7 +58,7 @@ indexRouter.post(
         [firstName, lastName, username, hashedPassword, "basic"]
       );
 
-      res.redirect("/log-in");
+      res.redirect("/join-club");
     } catch (err) {
       console.error(err);
       res.status(500).send("Server error.");
@@ -72,4 +74,30 @@ indexRouter.post("/log-in", (req, res) => {
   res.redirect("/log-in");
 });
 
+indexRouter.get("/join-club", (req, res) => {
+  res.render("join", { error: [] });
+});
+
+indexRouter.post("/join-club", async (req, res) => {
+  const { passcode } = req.body;
+
+  if (!req.user) {
+    return res.status(401).send("You must be logged in to join the club.");
+  }
+
+  if (passcode !== SECRET_PASSCODE) {
+    return res.render("join", { error: "Incorrect passcode." });
+  }
+
+  try {
+    await db.query("UPDATE users SET membership_status = $1 WHERE id = $2", [
+      "member",
+      req.user.id,
+    ]);
+    res.redirect("/");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server error.");
+  }
+});
 module.exports = indexRouter;
