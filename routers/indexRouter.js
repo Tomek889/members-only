@@ -3,11 +3,12 @@ const indexRouter = Router();
 const bcrypt = require("bcrypt");
 const { body, validationResult } = require("express-validator");
 const db = require("../db/db");
+const passport = require("passport");
 
 const SECRET_PASSCODE = process.env.SECRET_PASSCODE || "secret";
 
 indexRouter.get("/", (req, res) => {
-  res.render("index");
+  res.render("index", { user: req.user });
 });
 
 indexRouter.get("/sign-up", (req, res) => {
@@ -67,11 +68,29 @@ indexRouter.post(
 );
 
 indexRouter.get("/log-in", (req, res) => {
-  res.render("log-in");
+  res.render("log-in", { error: [] });
 });
 
-indexRouter.post("/log-in", (req, res) => {
-  res.redirect("/log-in");
+indexRouter.post("/log-in", (req, res, next) => {
+  passport.authenticate("local", (err, user, info) => {
+    if (err) return next(err);
+    if (!user) {
+      return res.render("log-in", { error: info?.message || "Login failed" });
+    }
+    req.logIn(user, (err) => {
+      if (err) return next(err);
+      return res.redirect("/");
+    });
+  })(req, res, next);
+});
+
+indexRouter.get("/log-out", (req, res, next) => {
+  req.logout((err) => {
+    if (err) {
+      return next(err);
+    }
+    res.redirect("/");
+  });
 });
 
 indexRouter.get("/join-club", (req, res) => {
@@ -100,4 +119,9 @@ indexRouter.post("/join-club", async (req, res) => {
     res.status(500).send("Server error.");
   }
 });
+
+indexRouter.get("/new-message", (req, res) => {
+  res.render("new-message");
+});
+
 module.exports = indexRouter;
