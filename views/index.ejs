@@ -8,8 +8,9 @@
   </head>
   <body>
     <nav>
-      <a href="/join-club">Join the Club</a>
       <% if (user) {%>
+      <a href="/join-club">Join the Club</a>
+      <a href="/become-admin">Become an Admin</a>
       <a href="/new-message">Create a new message</a>
       <a href="/log-out">Log Out</a>
       <% } else { %>

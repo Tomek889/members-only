@@ -6,6 +6,7 @@ const db = require("../db/db");
 const passport = require("passport");
 
 const SECRET_PASSCODE = process.env.SECRET_PASSCODE || "secret";
+const SECRET_ADMIN_PASSCODE = process.env.SECRET_ADMIN_PASSCODE || "secret";
 
 indexRouter.get("/", async (req, res) => {
   try {
@@ -141,6 +142,35 @@ indexRouter.post("/join-club", async (req, res) => {
   try {
     await db.query("UPDATE users SET membership_status = $1 WHERE id = $2", [
       "member",
+      req.user.id,
+    ]);
+    res.redirect("/");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server error.");
+  }
+});
+
+indexRouter.get("/become-admin", (req, res) => {
+  res.render("become-admin", { error: [] });
+});
+
+indexRouter.post("/become-admin", async (req, res) => {
+  const { passcode } = req.body;
+
+  if (!req.user) {
+    return res.status(401).send("You must be logged in to become an admin.");
+  }
+
+  console.log(SECRET_ADMIN_PASSCODE)
+
+  if (passcode !== SECRET_ADMIN_PASSCODE) {
+    return res.render("become-admin", { error: "Incorrect passcode." });
+  }
+
+  try {
+    await db.query("UPDATE users SET membership_status = $1 WHERE id = $2", [
+      "admin",
       req.user.id,
     ]);
     res.redirect("/");

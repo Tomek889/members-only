@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Become an Admin</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <h1>Become an Admin</h1>
+    <form action="/become-admin" method="POST">
+      <label for="passcode">Secret Passcode:</label>
+      <input type="password" name="passcode" required />
+      <button type="submit">Submit</button>
+
+      <% if (error) { %>
+      <p class="error"><%= error %></p>
+      <% } %>
+    </form>
+  </body>
+</html>
