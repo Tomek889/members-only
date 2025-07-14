@@ -37,7 +37,7 @@
         <% } else { %>
         <p class="author">Author: hidden</p>
         <% } %> <% if (membership === 'admin') { %>
-        <form action="/delete" method="POST">
+        <form action="/delete" method="POST" class="deleteForm">
           <input type="hidden" name="id" value="<%= message.id %>" />
           <button type="submit" class="deleteBtn">Delete</button>
         </form>

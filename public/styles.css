@@ -84,16 +84,51 @@ button {
   background-color: #c4dfdf;
   padding: 2px 16px;
   border-radius: 8px;
-  border: none;
+  border: 1.5px solid #293838;
+  margin-top: 5px;
+  cursor: pointer;
 }
 
 nav {
   display: flex;
   justify-content: space-around;
+  align-items: center;
+  padding: 20px 0px;
 }
 
 nav a {
   font-size: 1.5rem;
   text-decoration: none;
   color: #293838;
+}
+
+.messages {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 35px;
+  padding: 35px;
+}
+
+.message {
+  background-color: #d2e9e9;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+input,
+textarea {
+  width: 400px;
+}
+
+textarea {
+  height: 200px;
+}
+
+.heading {
+  padding: 35px;
+  padding-bottom: 0px;
+}
+
+form:not(.deleteForm) {
+  padding: 0px 35px;
 }
