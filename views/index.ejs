@@ -9,7 +9,7 @@
   <body>
     <nav>
       <a href="/join-club">Join the Club</a>
-      <% if (locals.user) {%>
+      <% if (user) {%>
       <a href="/new-message">Create a new message</a>
       <a href="/log-out">Log Out</a>
       <% } else { %>
@@ -17,5 +17,21 @@
       <a href="/sign-up">Sign Up</a>
       <% } %>
     </nav>
+    <div class="messages">
+      <% for (let message of messages) { %>
+      <div class="message">
+        <h2 class="title"><%= message.title %></h2>
+        <p class="text">Text: <%= message.text %></p>
+        <p class="timestamp">
+          Posted: <%= new Date(message.timestamp).toLocaleString() %>
+        </p>
+        <% if (membership === 'admin' || membership === 'member') { %>
+        <p class="author">Author: <%= message.author %></p>
+        <% } else { %>
+        <p class="author">Author: hidden</p>
+        <% } %>
+      </div>
+      <% } %>
+    </div>
   </body>
 </html>

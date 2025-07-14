@@ -7,8 +7,31 @@ const passport = require("passport");
 
 const SECRET_PASSCODE = process.env.SECRET_PASSCODE || "secret";
 
-indexRouter.get("/", (req, res) => {
-  res.render("index", { user: req.user });
+indexRouter.get("/", async (req, res) => {
+  try {
+    const result = await db.query(`
+      SELECT messages.*, users.username AS author
+      FROM messages
+      JOIN users ON messages.author_id = users.id
+      ORDER BY messages.timestamp DESC
+    `);
+    let membership = null;
+    if (req.user) {
+      const resultMembership = await db.query(
+        "SELECT membership_status FROM users WHERE id = $1",
+        [req.user.id]
+      );
+      membership = resultMembership.rows[0].membership_status;
+    }
+    res.render("index", {
+      user: req.user,
+      messages: result.rows,
+      membership: membership,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server error.");
+  }
 });
 
 indexRouter.get("/sign-up", (req, res) => {
@@ -54,12 +77,19 @@ indexRouter.post(
 
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      await db.query(
-        "INSERT INTO users (first_name, last_name, username, password, membership_status) VALUES ($1, $2, $3, $4, $5)",
+      const result = await db.query(
+        "INSERT INTO users (first_name, last_name, username, password, membership_status) VALUES ($1, $2, $3, $4, $5) RETURNING *",
         [firstName, lastName, username, hashedPassword, "basic"]
       );
 
-      res.redirect("/join-club");
+      const newUser = result.rows[0];
+
+      req.login(newUser, (err) => {
+        if (err) {
+          return next(err);
+        }
+        return res.redirect("/join-club");
+      });
     } catch (err) {
       console.error(err);
       res.status(500).send("Server error.");
@@ -121,11 +151,32 @@ indexRouter.post("/join-club", async (req, res) => {
 });
 
 indexRouter.get("/new-message", (req, res) => {
-  res.render("new-message");
+  res.render("new-message", { error: [] });
 });
 
-indexRouter.post("/new-message", (req, res) => {
-  res.redirect("/");
+indexRouter.post("/new-message", async (req, res) => {
+  const { title, text } = req.body;
+
+  if (!req.user) {
+    return res.render("new-message", {
+      error: "You must be logged in to create a message.",
+    });
+  }
+
+  if (title.length > 255) {
+    return res.render("new-message", { error: "The title is too long." });
+  }
+
+  try {
+    await db.query(
+      "INSERT INTO messages (title, text, author_id) VALUES ($1, $2, $3)",
+      [title, text, req.user.id]
+    );
+    res.redirect("/");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server error.");
+  }
 });
 
 module.exports = indexRouter;
