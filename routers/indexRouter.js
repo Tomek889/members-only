@@ -162,8 +162,6 @@ indexRouter.post("/become-admin", async (req, res) => {
     return res.status(401).send("You must be logged in to become an admin.");
   }
 
-  console.log(SECRET_ADMIN_PASSCODE)
-
   if (passcode !== SECRET_ADMIN_PASSCODE) {
     return res.render("become-admin", { error: "Incorrect passcode." });
   }
@@ -202,6 +200,32 @@ indexRouter.post("/new-message", async (req, res) => {
       "INSERT INTO messages (title, text, author_id) VALUES ($1, $2, $3)",
       [title, text, req.user.id]
     );
+    res.redirect("/");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Server error.");
+  }
+});
+
+indexRouter.post("/delete", async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).send("You must be logged in.");
+    }
+
+    const resultMembership = await db.query(
+      "SELECT membership_status FROM users WHERE id = $1",
+      [req.user.id]
+    );
+
+    const membership = resultMembership.rows[0].membership_status;
+
+    if (membership !== "admin") {
+      return res.status(403).send("You are not an admin.");
+    }
+
+    await db.query("DELETE FROM messages WHERE id = $1", [req.body.id]);
+
     res.redirect("/");
   } catch (err) {
     console.error(err);
