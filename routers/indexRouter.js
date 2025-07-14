@@ -124,4 +124,8 @@ indexRouter.get("/new-message", (req, res) => {
   res.render("new-message");
 });
 
+indexRouter.post("/new-message", (req, res) => {
+  res.redirect("/");
+});
+
 module.exports = indexRouter;
